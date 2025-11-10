@@ -1,0 +1,775 @@
+{
+  "name": "Website Rag Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "15rJA0J-TKXzfRVQJif-ESsWCELS_8r1g",
+          "mode": "list",
+          "cachedResultName": "Care_Hospital_Information.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/15rJA0J-TKXzfRVQJif-ESsWCELS_8r1g/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -3200,
+        272
+      ],
+      "id": "0ebc092f-9e81-4c52-9c20-8013d8d8f7f9",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "pqg1ctOivFkHkjGQ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -2880,
+        272
+      ],
+      "id": "26172698-7f1d-437d-a447-b3d458dd32ea",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "9BR9J87feWbv6UmF",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -2816,
+        544
+      ],
+      "id": "44dd521a-77cb-4f8b-8333-ffa852bcd4bd",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2832,
+        0
+      ],
+      "id": "6ae1d2d6-390c-42c0-9480-877e106a8ff6",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8cj2HuOZBwKm2dWN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3568,
+        272
+      ],
+      "id": "c1631789-9318-40ab-bc10-d6c8c808390c",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "loadPreviousSession": "notSupported"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -3504,
+        -576
+      ],
+      "id": "566d7eea-af4c-4bb8-bf00-fe53ec172c2c",
+      "name": "When chat message received",
+      "webhookId": "61ba5582-1777-470c-a524-fab3af3fbed8"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Care Hospital virtual assistant.\nAlways greet users warmly without using a personal name.\nWhen someone says hello, hi, hey, or similar, reply with:\n\"Welcome to Care Hospital! How can I help you today? Would you like to know about our doctors, departments, or available services?\"\nKeep your tone professional, kind, and helpful.\nDo not introduce yourself by any name.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3024,
+        -576
+      ],
+      "id": "f9fa87f6-98a5-4715-ae82-95c885b72966",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3280,
+        -240
+      ],
+      "id": "86879a0b-24c0-4819-8704-efea2beace6c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8cj2HuOZBwKm2dWN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "retrieve answers for the query from chat input",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 2,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -2800,
+        -192
+      ],
+      "id": "e5e2728a-6d51-48f4-9122-ec37d13135d8",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "9BR9J87feWbv6UmF",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -3040,
+        -192
+      ],
+      "id": "3a76ca12-517e-4c69-8fec-38ab07b7804b",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "vZ6Xpp8gfaRgrneD",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "11a2fa1a-a65a-4806-b69c-96b9b7c90946",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "not satisfied",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "ef2efd2b-4b4d-4485-b039-d70009f7d590",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "complain",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "0bc5436d-9b92-4f48-ba05-4f918eb98690",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "customer service agent",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "c6ffb33a-376b-4ea9-8b5a-9160b11c7daf",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "talk, person",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "2c7892bd-5e70-4ca6-ba06-a1c3a5b112a2",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "human",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "7cced68e-c185-48b3-856b-6eb542373120",
+              "leftValue": "={{ $('When chat message received').item.json.chatInput }}",
+              "rightValue": "someone",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2096,
+        -288
+      ],
+      "id": "2723cfb6-660f-48a3-a67f-26c12ec38b0e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5ff69681-8572-4296-88b6-dc1e598ec846",
+              "name": "formatted_chat",
+              "value": "={{ \n  $json.message && $json.message.type && $json.message.content\n    ? ($json.message.type === \"human\" \n        ? `👤 User: ${$json.message.content}` \n        : $json.message.type === \"ai\" \n          ? `🤖 Bot: ${$json.message.content}` \n          : \"⚠️ No chat data found.\"\n      )\n    : \"⚠️ No chat data found.\"\n}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1184,
+        -576
+      ],
+      "id": "0307b1ab-c5d5-4e41-80bd-58ececf59b1a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "n8n_chat_histories",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.session_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1424,
+        -576
+      ],
+      "id": "82c102cf-0f76-412c-99b5-99f6134e1e78",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "9BR9J87feWbv6UmF",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant. if someone told you about any complain or feel exasted, angry or unsatisfied and want to forward a complain, then you respond humbly and patiently and resonse them that their complain has been send forward. soon we will contact you"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1696,
+        -304
+      ],
+      "id": "9e4d2f8a-8985-458f-ab9d-72ccb64e0d76",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        -112
+      ],
+      "id": "dffe3666-f9a6-4841-b9a9-28570b1c7fff",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8cj2HuOZBwKm2dWN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "mmhashmiiii@gmail.com",
+        "subject": "Customer Complain - Immediate Attention Required",
+        "message": "=Hi there, I hope this message finds you well.  We have received a complaint from a customer regarding their recent interaction with our chatbot. The customer has expressed dissatisfaction and is requesting further assistance from a human representative.\nDetails: \n\nCustomer Name / ID: {{ $('Append or update row in sheet').item.json.session_id }} \n\nDate/Time of Interaction: {{ $now }}  \n\nSummary of Issue: {{ $json.data.map(item => item.formatted_chat).join(\"<br>\") }}\n\n The customer is upset and requires timely support. Kindly review the case and take the necessary actions to resolve their concerns.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -688,
+        -576
+      ],
+      "id": "9723c49c-b7bc-4f31-9432-8ca29c954d27",
+      "name": "Send a message",
+      "webhookId": "364cf5e3-0b18-4a6f-9315-d2d520eadae6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Ngi1YCaou1OpnNMS",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1SvSS4XaaC6VeMLk1sHxmB_n70ZDWT_9owIE5uLrYFNI",
+          "mode": "list",
+          "cachedResultName": "chatbot history",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SvSS4XaaC6VeMLk1sHxmB_n70ZDWT_9owIE5uLrYFNI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SvSS4XaaC6VeMLk1sHxmB_n70ZDWT_9owIE5uLrYFNI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('When chat message received').item.json.sessionId }}"
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "timestamp ",
+              "displayName": "timestamp ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "user_message",
+              "displayName": "user_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "bot_response",
+              "displayName": "bot_response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1728,
+        -576
+      ],
+      "id": "77e3da21-52e6-4d05-88cd-0612640acb31",
+      "name": "Append or update row in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "F9u5nhVuQNgqLOab",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -576
+      ],
+      "id": "2749fdd6-c086-4387-952b-b32046d13744",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"reply\": \"{{$node['AI Agent'].json['output']}}\",\n  \"status\": \"ok\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1744,
+        112
+      ],
+      "id": "b24fb563-f969-4e2b-a628-08dea6614e49",
+      "name": "Respond to Webhook1",
+      "retryOnFail": true,
+      "waitBetweenTries": 30
+    },
+    {
+      "parameters": {
+        "content": "save chat history\n",
+        "height": 992,
+        "width": 1904
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2160,
+        -656
+      ],
+      "id": "a9242635-4287-4fca-b6ad-1fca7f2c3ce0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "RAG AGENT\n",
+        "height": 832,
+        "width": 1152,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3664,
+        -672
+      ],
+      "id": "34c8647b-a38f-4e8d-b278-b10ea69b825d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "RAG oipeline\n",
+        "height": 480,
+        "width": 1152,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3664,
+        240
+      ],
+      "id": "66e0e9d1-b07f-4eb4-9c3e-551090548edf",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Karachi",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "92ca5288-04a6-480a-8615-c8383c3514dc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6a55fe373588851a2718f38b2b67cf7c0a4a1729d7181bb909226a8d759ba23"
+  },
+  "id": "Etj1XTXzBzIW1aA9",
+  "tags": [
+    {
+      "createdAt": "2025-10-07T11:56:45.826Z",
+      "updatedAt": "2025-10-07T11:56:45.826Z",
+      "id": "grx5HrfefhBrHXEV",
+      "name": "sir zafar"
+    }
+  ]
+}
